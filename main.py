@@ -88,7 +88,7 @@ async def qr(db : Session = Depends(get_db),current_user: schemas.User= Depends(
     return {'qrdata':qr_data}
 
 @app.put('/pointincrement',tags=['user'],)
-async def user(id1:int,db : Session = Depends(get_db),current_user: schemas.User= Depends(oaut2.get_current_active_user)):
+async def user(db : Session = Depends(get_db),current_user: schemas.User= Depends(oaut2.get_current_active_user)):
     
     # user = db.query(model.user).filter(model.user.id == id1).first()
     current_user.points=current_user.points+10
