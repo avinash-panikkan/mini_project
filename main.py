@@ -89,9 +89,9 @@ async def qr(db : Session = Depends(get_db),current_user: schemas.User= Depends(
 
 @app.put('/pointincrement',tags=['user'],)
 async def user(db : Session = Depends(get_db),current_user: schemas.User= Depends(oaut2.get_current_active_user)):
-    
-    # user = db.query(model.user).filter(model.user.id == id1).first()
-    current_user.points=current_user.points+10
+    id1=current_user.id
+    user = db.query(model.user).filter(model.user.id == id1).first()
+    user.points=user.points+10
     db.commit()
     return "updated 10 points"
 
