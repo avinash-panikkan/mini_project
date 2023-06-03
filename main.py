@@ -45,7 +45,7 @@ def get_db():
 
 
 @app.post('/user',tags=['user'])
-async def user(request:schemas.User,db : Session = Depends(get_db)):
+async def user(request:schemas.User1,db : Session = Depends(get_db)):
     
     user2 = db.query(model.user).filter(model.user.name == request.Name).first()
     
@@ -54,7 +54,7 @@ async def user(request:schemas.User,db : Session = Depends(get_db)):
     
     
     userid = str(uuid.uuid4())
-    user1 = model.user(name = request.Name,email = request.email,password = request.password,uid =  userid)
+    user1 = model.user(name = request.Name,email = request.email,password = request.password,uid =  userid,role =request.role)
     
     db.add(user1)
     db.commit()
@@ -94,6 +94,20 @@ async def user(db : Session = Depends(get_db),current_user: schemas.User= Depend
     user.points=user.points+10
     db.commit()
     return "updated 10 points"
+
+
+
+@app.put('/adminedit',tags=['user'],)
+async def adminedit(request:schemas.username,db : Session = Depends(get_db),current_user: schemas.User= Depends(oaut2.adminlogin)):
+    
+    id1=current_user.id
+    user = db.query(model.user).filter(model.user.name == request.name).first()
+    user.points=request.point
+    
+    db.commit()
+    return "updated users points"
+
+
 
 
 @app.get('/user_leaderboadrd',tags=['user'])

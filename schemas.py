@@ -23,6 +23,13 @@ class Points(BaseModel):
     points: int
     
     
+    
+    
+class username(BaseModel):
+    name: str
+    point:int
+    
+    
      
 class productB(BaseModel):
     pid:str
