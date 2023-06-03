@@ -13,7 +13,7 @@ import uuid
 import oaut2
 # from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-
+from sqlalchemy.orm import relationship
 # Generate QR code
 
 
@@ -45,7 +45,7 @@ def get_db():
 
 
 @app.post('/user',tags=['user'])
-async def user(request:schemas.User1,db : Session = Depends(get_db)):
+async def user(request:schemas.User,db : Session = Depends(get_db)):
     
     user2 = db.query(model.user).filter(model.user.name == request.Name).first()
     
@@ -54,14 +54,14 @@ async def user(request:schemas.User1,db : Session = Depends(get_db)):
     
     
     userid = str(uuid.uuid4())
-    user1 = model.user(name = request.Name,email = request.email,password = request.password,uid =  userid,role = request.role)
+    user1 = model.user(name = request.Name,email = request.email,password = request.password,uid =  userid)
     
     db.add(user1)
     db.commit()
     db.refresh(user1) 
     
     return user1
- 
+  
 
 @app.get('/user/{id1}',tags=['user'])
 async def user(id1:int,db : Session = Depends(get_db),get_current_user : schemas.User = Depends(oaut2.get_current_user)):
@@ -137,23 +137,34 @@ async def read_users_me(current_user: schemas.User= Depends(oaut2.get_current_ac
 
 
 @app.post('/add_product',tags=['product'])
-async def user(request:schemas.product,db : Session = Depends(get_db)):
+async def add(request:schemas.prod,current_user: schemas.User= Depends(oaut2.get_current_active_user), db : Session = Depends(get_db)):
     
-    prodid = str(uuid.uuid4())
-    product1 = model.Product(pname = request.pname,ppid = prodid)
+    # prodid = str(uuid.uuid4())
+    product1 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
     db.add(product1)
-    db.commit()
-    db.refresh(product1) 
+    db.commit() 
+    db.refresh(product1)   
     return product1
 
 
+@app.put('/dispose_product', tags=['product'])
+async def dispose(request:schemas.prod,current_user: schemas.User= Depends(oaut2.get_current_active_user), db : Session = Depends(get_db)):
+    
+    # prodid = str(uuid.uuid4())  
+    product1 = db.query(model.Product).filter((model.Product.user_id == current_user.id) & (model.Product.pid == request.pid) & (model.Product.purchased == True) & (model.Product.disposed == False)).first()
+    product1.disposed = True 
+    # product2 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
+    # db.add(product1)
+    db.commit() 
+    db.refresh(product1)    
+    return "Success"
 
 
 #garbage can
 
 
 @app.get('/garbage',tags=['garbage'])
-async def user(db : Session = Depends(get_db)):
+async def getbin(db : Session = Depends(get_db)):
     
     garbageid = str(uuid.uuid4())
     garb1 = model.garbage(gid = garbageid)
@@ -171,10 +182,34 @@ async def user(db : Session = Depends(get_db)):
 
 
 @app.post('/garbage_validation',tags=['garbage'])
-async def user(request:schemas.garbage,db : Session = Depends(get_db)):
+async def validatebin(request:schemas.garbage,current_user: schemas.User= Depends(oaut2.get_current_active_user),db : Session = Depends(get_db)):
 
     garb1 = model.garbage(gid = request.gid)
     if not garb1:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="invalid qr code")
     return garb1
 
+ 
+ #redeem
+ 
+@app.put('/redeem', tags=['product'])
+async def redeem(request:schemas.Points, current_user: schemas.User= Depends(oaut2.get_current_active_user), db : Session = Depends(get_db)):
+    
+    # prodid = str(uuid.uuid4())  
+    user_pts = db.query(model.user).filter((model.user.uid == current_user.uid)).first()
+    if user_pts.points >= request.points:
+        user_pts.points = user_pts.points - request.points
+    
+    store_pts = db.query(model.user).filter(model.user.uid == request.uid).first()
+    if store_pts is not None:
+        store_pts.points = store_pts.points + request.points
+        
+        db.commit() 
+        return "Success" 
+    else:
+        return "Store not found"
+    # product2 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
+    # db.add(product1)
+    # db.refresh(product1)    
+
+ 

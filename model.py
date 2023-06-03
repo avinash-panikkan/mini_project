@@ -2,6 +2,7 @@ from database import Base
 from sqlalchemy import Column,Integer,String,ForeignKey,Boolean
 from sqlalchemy.orm import relationship
 
+
 class user(Base):
     __tablename__ = "users"
 
@@ -13,13 +14,20 @@ class user(Base):
     uid = Column(String)
     role = Column(String,default="user")
     
+    product = relationship("Product", back_populates="owner")
+
+    
 class Product(Base):
     __tablename__ = "product"
 
     id = Column(Integer, index=True, primary_key=True)
     pid = Column(String, nullable=True)
     purchased = Column(Boolean, default=False)
-
+    disposed = Column(Boolean, default=False)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    
+    owner = relationship("user", back_populates="product")
+ 
 class purchase(Base):  
     __tablename__ = "purchase info"
 
@@ -29,7 +37,7 @@ class purchase(Base):
     puechaserd = Column(Boolean,default=False)
     uid = Column(String, nullable = True)
     uname = Column(String)
-    
+      
     
     
 class garbage(Base):  

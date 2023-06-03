@@ -17,10 +17,27 @@ class login(BaseModel):
     
 class UserInDB(User):
     password: str 
+   
+class Points(BaseModel):
+    uid: str
+    points: int
     
-class product(BaseModel):
+    
+     
+class productB(BaseModel):
     pid:str
     
+class product(productB):
+    user_id: int
+    class Config:
+        orm_mode = True 
+        
+        
+class prod(BaseModel):
+    pid:str      
+
+    
+
 
 class garbage(BaseModel):
     gid:str
