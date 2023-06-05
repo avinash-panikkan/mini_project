@@ -53,7 +53,7 @@ async def user(request:schemas.User1,db : Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_302_FOUND,detail="user alredy exist")
     
     
-    userid = str(uuid.uuid4())
+    userid = "rubbishrevolution " + str(uuid.uuid4())
     user1 = model.user(name = request.Name,email = request.email,password = request.password,uid =  userid,role =request.role)
     
     db.add(user1)
@@ -87,13 +87,13 @@ async def qr(db : Session = Depends(get_db),current_user: schemas.User= Depends(
     
     return {'qrdata':qr_data}
 
-@app.put('/pointincrement',tags=['user'],)
-async def user(db : Session = Depends(get_db),current_user: schemas.User= Depends(oaut2.get_current_active_user)):
-    id1=current_user.id
-    user = db.query(model.user).filter(model.user.id == id1).first()
-    user.points=user.points+10
-    db.commit()
-    return "updated 10 points"
+# @app.put('/pointincrement',tags=['user'],)
+# async def user(db : Session = Depends(get_db),current_user: schemas.User= Depends(oaut2.get_current_active_user)):
+#     id1=current_user.id
+#     user = db.query(model.user).filter(model.user.id == id1).first()
+#     user.points=user.points+10
+#     db.commit()
+#     return "updated 10 points"
 
 
 
@@ -151,10 +151,10 @@ async def read_users_me(current_user: schemas.User= Depends(oaut2.get_current_ac
 
 
 @app.post('/add_product',tags=['product'])
-async def add(request:schemas.prod,current_user: schemas.User= Depends(oaut2.get_current_active_user), db : Session = Depends(get_db)):
+async def add(request:schemas.prod,current_user: schemas.User= Depends(oaut2.storelogin), db : Session = Depends(get_db)):
     
     # prodid = str(uuid.uuid4())
-    product1 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
+    product1 = model.Product(pid = request.pid, purchased=True)
     db.add(product1)
     db.commit() 
     db.refresh(product1)   
@@ -165,13 +165,30 @@ async def add(request:schemas.prod,current_user: schemas.User= Depends(oaut2.get
 async def dispose(request:schemas.prod,current_user: schemas.User= Depends(oaut2.get_current_active_user), db : Session = Depends(get_db)):
     
     # prodid = str(uuid.uuid4())  
-    product1 = db.query(model.Product).filter((model.Product.user_id == current_user.id) & (model.Product.pid == request.pid) & (model.Product.purchased == True) & (model.Product.disposed == False)).first()
+    product1 = db.query(model.Product).filter((model.Product.pid == request.pid) & (model.Product.purchased == True) & (model.Product.disposed == False)).first()
+    if not product1:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
     product1.disposed = True 
-    # product2 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
-    # db.add(product1)
     db.commit() 
     db.refresh(product1)    
-    return "Success"
+    
+    if product1.user_id == current_user.id:
+        id1=current_user.id
+        user = db.query(model.user).filter(model.user.id == id1).first()
+        user.points=user.points+10
+        db.commit()
+        return "updated 10 points"
+    else:
+        id1=product1.user_id
+        user = db.query(model.user).filter(model.user.id == id1).first() 
+        user.points=user.points-10
+        id1=current_user.id
+        user = db.query(model.user).filter(model.user.id == id1).first()
+        user.points=user.points+10
+        db.commit()
+        return "decrement 10 points"
+    # product2 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
 
 
 #garbage can

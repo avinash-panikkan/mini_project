@@ -28,16 +28,16 @@ class Product(Base):
     
     owner = relationship("user", back_populates="product")
  
-class purchase(Base):  
-    __tablename__ = "purchase info"
+# class purchase(Base):  
+#     __tablename__ = "purchase info"
 
-    id = Column(Integer,index = True,primary_key = True)
-    pname=Column(String) 
-    pid = Column(String, nullable = True,primary_key = True)
-    puechaserd = Column(Boolean,default=False)
-    uid = Column(String, nullable = True)
-    uname = Column(String)
-      
+#     id = Column(Integer,index = True,primary_key = True)
+#     pname=Column(String) 
+#     pid = Column(String, nullable = True,primary_key = True)
+#     puechaserd = Column(Boolean,default=False)
+#     uid = Column(String, nullable = True)
+#     uname = Column(String)
+       
     
     
 class garbage(Base):  

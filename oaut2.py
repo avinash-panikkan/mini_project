@@ -57,11 +57,11 @@ async def adminlogin(data:str = Depends(oauth2_scheme),db : Session = Depends(ge
     try:
         payload = jwt.decode(data, SECRET_KEY, algorithms=[ALGORITHM])
         # print(payload)
-        admin  = payload.get("role")
+        role  = payload.get("role")
         uid1 = payload.get("uid")
         
         
-        if admin == "admin":
+        if role == "admin":
             # print(id1)
             user = db.query(model.user).filter(model.user.uid == uid1).first()
             return user
@@ -70,4 +70,30 @@ async def adminlogin(data:str = Depends(oauth2_scheme),db : Session = Depends(ge
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="invalid password")
     
+    
+    
+async def storelogin(data:str = Depends(oauth2_scheme),db : Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(data, SECRET_KEY, algorithms=[ALGORITHM])
+        # print(payload)
+        role  = payload.get("role")
+        uid1 = payload.get("uid")
+        
+        
+        if role == "store":
+            # print(id1)
+            user = db.query(model.user).filter(model.user.uid == uid1).first()
+            return user
+        else:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="you are not store")
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="invalid password")
+    
+    
+
     
