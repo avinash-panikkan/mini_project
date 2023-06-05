@@ -154,7 +154,7 @@ async def read_users_me(current_user: schemas.User= Depends(oaut2.get_current_ac
 async def add(request:schemas.prod,current_user: schemas.User= Depends(oaut2.storelogin), db : Session = Depends(get_db)):
     
     # prodid = str(uuid.uuid4())
-    product1 = model.Product(pid = request.pid, purchased=True)
+    product1 = model.Product(pid = request.pid, purchased=True,user_id=request.uid)
     db.add(product1)
     db.commit() 
     db.refresh(product1)   

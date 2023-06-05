@@ -45,7 +45,8 @@ class product(productB):
         
         
 class prod(BaseModel):
-    pid:str      
+    pid:str
+    uid:str      
 
     
 class garbage(BaseModel):
