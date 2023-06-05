@@ -197,6 +197,14 @@ async def dispose(request:schemas.prod,current_user: schemas.User= Depends(oaut2
         db.commit()
         return "decrement 10 points"
     # product2 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
+    
+    
+    
+@app.get('/show_product',tags=['product'])
+async def show_product(db : Session = Depends(get_db)):
+    product1 = db.query(model.Product).all()
+    return product1
+    
 
 
 #garbage can
