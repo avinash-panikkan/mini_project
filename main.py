@@ -50,7 +50,7 @@ async def user(request:schemas.User1,db : Session = Depends(get_db)):
     user2 = db.query(model.user).filter(model.user.name == request.Name).first()
     
     if user2:
-        raise HTTPException(status_code=status.HTTP_302_FOUND,detail="user alredy exist")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     
     userid = "rubbishrevolution " + str(uuid.uuid4())
