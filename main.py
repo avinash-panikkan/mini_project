@@ -50,7 +50,7 @@ async def user(request:schemas.User1,db : Session = Depends(get_db)):
     user2 = db.query(model.user).filter(model.user.name == request.Name).first()
     
     if user2:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        raise HTTPException(status_code=500,detail="bad error")
     
     
     userid = "rubbishrevolution " + str(uuid.uuid4())
