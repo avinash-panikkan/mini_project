@@ -50,10 +50,17 @@ async def user(request:schemas.User1,db : Session = Depends(get_db)):
     user2 = db.query(model.user).filter(model.user.name == request.Name).first()
     
     if user2:
-        return {"error":"alredy exist"}
+        return {"error":"already exist"}
     
+    if request.role == "admin":
+        userid = "rubbishrevolutionadmin " + str(uuid.uuid4())
+    elif request.role == "store":
+        userid = "rubbishrevolutionstore " + str(uuid.uuid4())
+    elif request.role == "user":
+        userid = "rubbishrevolutionuser " + str(uuid.uuid4())
+    else:
+        return "Invalid role"
     
-    userid = "rubbishrevolution " + str(uuid.uuid4())
     user1 = model.user(name = request.Name,email = request.email,password = request.password,uid =  userid,role =request.role)
     
     db.add(user1)
@@ -154,7 +161,8 @@ async def read_users_me(current_user: schemas.User= Depends(oaut2.get_current_ac
 async def add(request:schemas.prod,current_user: schemas.User= Depends(oaut2.storelogin), db : Session = Depends(get_db)):
     
     # prodid = str(uuid.uuid4())
-    product1 = model.Product(pid = request.pid, purchased=True,user_id=request.uid)
+    user2 = db.query(model.user).filter(model.user.uid == request.uid).first()
+    product1 = model.Product(pid = request.pid, purchased=True,user_id=user2.id)
     db.add(product1)
     db.commit() 
     db.refresh(product1)   
@@ -197,7 +205,7 @@ async def dispose(request:schemas.prod,current_user: schemas.User= Depends(oaut2
 @app.get('/garbage',tags=['garbage'])
 async def getbin(db : Session = Depends(get_db)):
     
-    garbageid = str(uuid.uuid4())
+    garbageid = "rubbishgarbage " + str(uuid.uuid4())
     garb1 = model.garbage(gid = garbageid)
     
     db.add(garb1)
