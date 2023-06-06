@@ -180,27 +180,26 @@ async def dispose(request:schemas.prod1,current_user: schemas.User= Depends(oaut
     # prodid = str(uuid.uuid4())  
     for prod in request.pid:
         product1 = db.query(model.Product).filter((model.Product.pid == prod) & (model.Product.purchased == True) & (model.Product.disposed == False)).first()
-        if not product1:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-        product1.disposed = True 
-        db.commit() 
-        db.refresh(product1)    
-    
-        if product1.user_id == current_user.id:
-            id1=current_user.id
-            user = db.query(model.user).filter(model.user.id == id1).first()
-            user.points=user.points+10
-            db.commit()
-            
-        else:
-            id1=product1.user_id
-            user = db.query(model.user).filter(model.user.id == id1).first() 
-            user.points=user.points-10
-            id1=current_user.id
-            user = db.query(model.user).filter(model.user.id == id1).first()
-            user.points=user.points+10
-            db.commit()
+        
+        if product1:
+            product1.disposed = True 
+            db.commit() 
+            db.refresh(product1)    
+        
+            if product1.user_id == current_user.id:
+                id1=current_user.id
+                user = db.query(model.user).filter(model.user.id == id1).first()
+                user.points=user.points+10
+                db.commit()
+                
+            else:
+                id1=product1.user_id
+                user = db.query(model.user).filter(model.user.id == id1).first() 
+                user.points=user.points-10
+                id1=current_user.id
+                user = db.query(model.user).filter(model.user.id == id1).first()
+                user.points=user.points+10
+                db.commit()
             
     return "updated points"
     # product2 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
