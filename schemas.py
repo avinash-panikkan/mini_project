@@ -48,6 +48,8 @@ class prod(BaseModel):
     pid:list=[]
     uid:str      
 
+class prod1(BaseModel):
+    pid:list=[]      
     
 class garbage(BaseModel):
     gid:str

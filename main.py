@@ -175,32 +175,34 @@ async def add(request:schemas.prod,current_user: schemas.User= Depends(oaut2.sto
 
 
 @app.put('/dispose_product', tags=['product'])
-async def dispose(request:schemas.prod,current_user: schemas.User= Depends(oaut2.get_current_active_user), db : Session = Depends(get_db)):
+async def dispose(request:schemas.prod1,current_user: schemas.User= Depends(oaut2.get_current_active_user), db : Session = Depends(get_db)):
     
     # prodid = str(uuid.uuid4())  
-    product1 = db.query(model.Product).filter((model.Product.pid == request.pid) & (model.Product.purchased == True) & (model.Product.disposed == False)).first()
-    if not product1:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    for prod in request.pid:
+        product1 = db.query(model.Product).filter((model.Product.pid == prod) & (model.Product.purchased == True) & (model.Product.disposed == False)).first()
+        if not product1:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     
-    product1.disposed = True 
-    db.commit() 
-    db.refresh(product1)    
+        product1.disposed = True 
+        db.commit() 
+        db.refresh(product1)    
     
-    if product1.user_id == current_user.id:
-        id1=current_user.id
-        user = db.query(model.user).filter(model.user.id == id1).first()
-        user.points=user.points+10
-        db.commit()
-        return "updated 10 points"
-    else:
-        id1=product1.user_id
-        user = db.query(model.user).filter(model.user.id == id1).first() 
-        user.points=user.points-10
-        id1=current_user.id
-        user = db.query(model.user).filter(model.user.id == id1).first()
-        user.points=user.points+10
-        db.commit()
-        return "decrement 10 points"
+        if product1.user_id == current_user.id:
+            id1=current_user.id
+            user = db.query(model.user).filter(model.user.id == id1).first()
+            user.points=user.points+10
+            db.commit()
+            
+        else:
+            id1=product1.user_id
+            user = db.query(model.user).filter(model.user.id == id1).first() 
+            user.points=user.points-10
+            id1=current_user.id
+            user = db.query(model.user).filter(model.user.id == id1).first()
+            user.points=user.points+10
+            db.commit()
+            
+    return "updated points"
     # product2 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
     
     
@@ -230,18 +232,19 @@ async def getbin(db : Session = Depends(get_db)):
     code = pyqrcode.create(key)
     qr_data = code.png_as_base64_str(scale=5)
     
-    return qr_data
+    return {"qrdata":qr_data}
 
 
 @app.post('/garbage_validation',tags=['garbage'])
 async def validatebin(request:schemas.garbage,current_user: schemas.User= Depends(oaut2.get_current_active_user),db : Session = Depends(get_db)):
-
-    garb1 = model.garbage(gid = request.gid)
+    gid1 = request.gid
+    garb1 =db.query(model.garbage).filter((model.garbage.gid == gid1)&(model.garbage.used == False)).first()
     if not garb1:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="invalid qr code")
-    return garb1
+        return {"status":"no"}
+    else:
+        return {"status":"yes"}
 
- 
+  
  #redeem
  
 @app.put('/redeem', tags=['product'])

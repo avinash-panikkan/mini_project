@@ -45,5 +45,6 @@ class garbage(Base):
 
     id = Column(Integer,index = True,primary_key = True)
     gid = Column(String, nullable = True)
+    used= Column(Boolean, default=False) 
 
     
