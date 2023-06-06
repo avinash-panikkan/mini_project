@@ -242,8 +242,12 @@ async def validatebin(request:schemas.garbage,current_user: schemas.User= Depend
     if not garb1:
         return {"status":"no"}
     else:
+        garb1.used=True
+        db.add(garb1)
+        db.commit()
+        db.refresh(garb1) 
         return {"status":"yes"}
-
+ 
   
  #redeem
  
