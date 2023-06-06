@@ -162,10 +162,15 @@ async def add(request:schemas.prod,current_user: schemas.User= Depends(oaut2.sto
     
     # prodid = str(uuid.uuid4())
     user2 = db.query(model.user).filter(model.user.uid == request.uid).first()
-    product1 = model.Product(pid = request.pid, purchased=True,user_id=user2.id)
-    db.add(product1)
-    db.commit() 
-    db.refresh(product1)   
+    if not user2:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    for prod in request.pid:
+        product1 = model.Product(pid = prod, purchased=True,user_id=user2.id)
+        
+        db.add(product1)
+        db.commit() 
+        db.refresh(product1)   
     return product1
 
 

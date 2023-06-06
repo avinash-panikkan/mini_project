@@ -45,7 +45,7 @@ class product(productB):
         
         
 class prod(BaseModel):
-    pid:str
+    pid:list=[]
     uid:str      
 
     
