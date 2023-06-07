@@ -13,13 +13,20 @@ import uuid
 import oaut2
 # from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.orm import relationship
-# Generate QR code
+import shutil
 
-
+#image upload
+from fastapi import File, UploadFile, Form
+import secrets
+from fastapi.staticfiles import StaticFiles
+from PIL import Image
 
 app = FastAPI()
 model.Base.metadata.create_all(engine)
+
+#static file setup config
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 origins = [
     "http://localhost",
@@ -42,6 +49,8 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
 
 
 @app.post('/user',tags=['user'])
@@ -82,6 +91,7 @@ async def user(db : Session = Depends(get_db),get_current_user : schemas.User = 
     
     user1 = db.query(model.user).all()
     return user1
+
 
 @app.get('/qr_gen',tags=['user'])
 async def qr(db : Session = Depends(get_db),current_user: schemas.User= Depends(oaut2.get_current_active_user)):
@@ -200,6 +210,7 @@ async def dispose(request:schemas.prod1,current_user: schemas.User= Depends(oaut
                 user = db.query(model.user).filter(model.user.id == id1).first()
                 user.points=user.points+10
                 db.commit()
+        
             
     return "updated points"
     # product2 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
@@ -270,4 +281,40 @@ async def redeem(request:schemas.Points, current_user: schemas.User= Depends(oau
     # db.add(product1)
     # db.refresh(product1)    
 
+ # plots
+
+
+#plots
  
+@app.post('/plots', tags=["plots"])
+async def addplot(name: str = Form(), points: int = Form(), file: UploadFile = File()):
+    
+    # Generate a unique filename for the uploaded image
+    FILEPATH = "static/plots/"
+    filename = file.filename
+    extension = filename.split(".")[-1]
+    
+    if extension not in ["png","jpg","jpeg","webp","heif"]:
+        return {
+            "status": "error",
+            "detail": "File extension not allowed"
+        }
+    
+    token_name = secrets.token_hex(10) + "." + extension  
+    generated_name = FILEPATH + token_name
+    file_content = await file.read()
+
+    with open(generated_name, "wb") as file:
+        file.write(file_content)
+        
+    #PILLOW - reduce size
+    img = Image.open(generated_name)
+    img = img.resize(size= (200, 200))
+    img.save(generated_name)
+    
+    return { 
+        "name": name,
+        "points": points,
+        "file_path": generated_name
+    }  
+   

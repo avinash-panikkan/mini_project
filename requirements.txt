@@ -6,3 +6,5 @@ pyqrcode
 pypng
 python-jose
 python-multipart
+Pillow
+aiofiles
