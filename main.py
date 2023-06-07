@@ -287,7 +287,8 @@ async def redeem(request:schemas.Points, current_user: schemas.User= Depends(oau
 #plots
  
 @app.post('/plots', tags=["plots"])
-async def addplot(name: str = Form(), points: int = Form(), file: UploadFile = File()):
+async def addplot(name: str = Form(), points: int = Form(), file: UploadFile = File(),
+                  current_user: schemas.User= Depends(oaut2.adminlogin),db : Session = Depends(get_db)):
     
     # Generate a unique filename for the uploaded image
     FILEPATH = "static/plots/"
@@ -312,9 +313,14 @@ async def addplot(name: str = Form(), points: int = Form(), file: UploadFile = F
     img = img.resize(size= (200, 200))
     img.save(generated_name)
     
+    plot1 = model.Plots(name= name, points= points, path= generated_name)
+    db.add(plot1)
+    db.commit()
+    db.refresh(plot1)
+    
     return { 
         "name": name,
         "points": points,
         "file_path": generated_name
     }  
-   
+    
