@@ -11,6 +11,7 @@ class user(Base):
     email=Column(String) 
     password=Column(String)
     points = Column(Integer,default=0)
+    money = Column(Integer,default=0)
     uid = Column(String)
     role = Column(String,default="user")
     
@@ -28,6 +29,14 @@ class Product(Base):
     
     owner = relationship("user", back_populates="product")
  
+ 
+class Value(Base):
+    __tablename__ = "values"
+
+    id = Column(Integer, index=True, primary_key=True)
+    value4m = Column(Integer)
+    
+    
 # class purchase(Base):  
 #     __tablename__ = "purchase info"
 
@@ -55,4 +64,4 @@ class Plots(Base):
     name = Column(String)
     points = Column(Integer)
     path = Column(String)
-    
+     

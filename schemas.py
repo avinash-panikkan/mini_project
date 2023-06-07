@@ -50,6 +50,11 @@ class prod(BaseModel):
     pid:list=[]
     uid:str      
 
+
+class value(BaseModel):
+    recycle_value: float
+    
+
 class prod1(BaseModel):
     pid:list=[]      
     

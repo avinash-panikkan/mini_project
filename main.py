@@ -8,12 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 import pyqrcode
 import png
 from tocken1 import create_access_token
-from sqlalchemy import desc
-import uuid
+from sqlalchemy import desc, func
+import uuid 
 import oaut2
 # from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-import shutil
+import math
 
 #image upload
 from fastapi import File, UploadFile, Form
@@ -340,3 +340,43 @@ async def delete_user(request:schemas.username1, db : Session = Depends(get_db))
     db.commit()
     return {"message": "User deleted successfully"}
     # User not found
+    
+    
+    
+@app.get('/reminder', tags=["reminder"]) 
+async def reminder(current_user: schemas.User= Depends(oaut2.get_current_active_user), db : Session = Depends(get_db)):
+    
+    prod_all = db.query(model.Product).filter((model.Product.user_id == current_user.id) & (model.Product.disposed == False)).all()
+    if not prod_all:
+        raise HTTPException(status_code=404, detail="No products to dispose")
+    
+    return prod_all 
+
+
+#calculate value
+
+@app.put('/calculate_value', tags=["calculate_value"]) 
+async def calculate_value(request:schemas.value,current_user: schemas.User= Depends(oaut2.adminlogin), db : Session = Depends(get_db)):
+    
+    # Calculate the sum of points using SQLAlchemy's func.sum
+    total_points = db.query(func.sum(model.user.points)).filter(model.user.points >= 0).scalar()
+    if total_points is None:
+        total_points = 0
+        
+    value = math.floor((request.recycle_value)/total_points) 
+    
+    add_value = model.Value(value4m= value)
+    db.add(add_value) 
+    db.commit()
+    db.refresh(add_value)
+    
+    limit = db.query(func.avg(model.user.points)).scalar()
+    print (limit)
+    
+    user1 = db.query(model.user).filter(model.user.points >= limit).all()
+    for user_info in user1:
+        user_info.money = user_info.points * add_value.value4m
+        db.commit()
+        
+    return {"value": add_value.value4m}  
+      
