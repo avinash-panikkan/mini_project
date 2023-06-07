@@ -33,6 +33,8 @@ class username(BaseModel):
     name: str
     point:int
     
+class username1(BaseModel):
+    name: str
     
 class productB(BaseModel):
     pid:str

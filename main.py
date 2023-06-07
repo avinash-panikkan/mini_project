@@ -119,7 +119,7 @@ async def adminedit(request:schemas.username,db : Session = Depends(get_db),curr
     
     id1=current_user.id
     user = db.query(model.user).filter(model.user.name == request.name).first()
-    user.points=request.point
+    user.points=user.points+request.point
     
     db.commit()
     return "updated users points"
@@ -324,3 +324,19 @@ async def addplot(name: str = Form(), points: int = Form(), file: UploadFile = F
         "file_path": generated_name
     }  
     
+    
+    
+    # delete user
+    
+@app.delete('/userdelete', tags=["delete"]) 
+async def delete_user(request:schemas.username1, db : Session = Depends(get_db)):
+    # Find the user with the specified user_id
+    
+    user1 = db.query(model.user).filter(model.user.name == request.name).first()
+    if not user1:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    db.delete(user1)
+    db.commit()
+    return {"message": "User deleted successfully"}
+    # User not found
