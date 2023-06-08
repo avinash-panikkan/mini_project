@@ -21,6 +21,9 @@ import secrets
 from fastapi.staticfiles import StaticFiles
 from PIL import Image
 
+from fastapi.middleware.cors import CORSMiddleware
+import requests
+
 app = FastAPI()
 model.Base.metadata.create_all(engine)
 
@@ -50,7 +53,7 @@ def get_db():
     finally:
         db.close()
 
-
+PRIVATE_KEY = "9efc7501-bd41-438b-9fe4-53b12456da65"
 
 
 @app.post('/user',tags=['user'])
@@ -377,6 +380,17 @@ async def calculate_value(request:schemas.value,current_user: schemas.User= Depe
     for user_info in user1:
         user_info.money = user_info.points * add_value.value4m
         db.commit()
-        
+        #should clear the points of those whos money is added
     return {"value": add_value.value4m}  
       
+@app.post('/authenticate')
+async def authenticate(user: schemas.User):
+    response = requests.put('https://api.chatengine.io/users/',
+        data={
+            "username": user.username,
+            "secret": user.username,
+            "first_name": user.username,
+        },
+        headers={ "Private-Key": PRIVATE_KEY }
+    )
+    return response.json()      
