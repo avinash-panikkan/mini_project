@@ -64,6 +64,7 @@ async def user(request:schemas.User1,db : Session = Depends(get_db)):
     if user2:
         return {"error":"already exist"}
     
+    
     if request.role == "admin":
         userid = "rubbishrevolutionadmin " + str(uuid.uuid4())
     elif request.role == "store":
@@ -75,11 +76,25 @@ async def user(request:schemas.User1,db : Session = Depends(get_db)):
     
     user1 = model.user(name = request.Name,email = request.email,password = request.password,uid =  userid,role =request.role)
     
+    
+    
+    
+    response = requests.put('https://api.chatengine.io/users/',
+        data={
+                "username": request.Name,
+                "secret": request.Name,
+                "first_name": request.Name,
+        },
+        headers={ "Private-Key": PRIVATE_KEY }
+    ) 
+    
+    
+    
     db.add(user1)
     db.commit()
     db.refresh(user1) 
     
-    return user1
+    return {"user":user,"chat":response.json()}
   
 
 @app.get('/user/{id1}',tags=['user'])
