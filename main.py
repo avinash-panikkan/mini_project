@@ -384,7 +384,7 @@ async def calculate_value(request:schemas.value,current_user: schemas.User= Depe
     return {"value": add_value.value4m}  
       
 @app.post('/authenticate')
-async def authenticate(user: schemas.User):
+async def authenticate(user: schemas.User6):
     response = requests.put('https://api.chatengine.io/users/',
         data={
             "username": user.username,

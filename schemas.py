@@ -70,5 +70,5 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     name: Union[str, None] = None
 
-class User(BaseModel):
+class User6(BaseModel):
     username: str
