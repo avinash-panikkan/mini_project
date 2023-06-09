@@ -280,26 +280,20 @@ async def validatebin(request:schemas.garbage,current_user: schemas.User= Depend
  #redeem
  
 @app.put('/redeem', tags=['product'])
-async def redeem(request:schemas.Points, current_user: schemas.User= Depends(oaut2.get_current_active_user), db : Session = Depends(get_db)):
+async def redeem(request:schemas.Money, current_user: schemas.User= Depends(oaut2.get_current_active_user), db : Session = Depends(get_db)):
     
-    # prodid = str(uuid.uuid4())  
-    user_pts = db.query(model.user).filter((model.user.uid == current_user.uid)).first()
-    if user_pts.points >= request.points:
-        user_pts.points = user_pts.points - request.points
+    user_money = db.query(model.user).filter((model.user.uid == current_user.uid)).first()
+    if user_money.money >= request.money:
+        user_money.money = user_money.money - request.money
     
-    store_pts = db.query(model.user).filter(model.user.uid == request.uid).first()
-    if store_pts is not None:
-        store_pts.points = store_pts.points + request.points
+    store_money = db.query(model.user).filter(model.user.uid == request.uid).first()
+    if store_money is not None:
+        store_money.money = store_money.money + request.money
         
         db.commit() 
         return "Success" 
     else:
         return "Store not found"
-    # product2 = model.Product(pid = request.pid, purchased=True, user_id= current_user.id)
-    # db.add(product1)
-    # db.refresh(product1)    
-
- # plots
 
 
 #plots
@@ -391,9 +385,10 @@ async def calculate_value(request:schemas.value,current_user: schemas.User= Depe
     limit = db.query(func.avg(model.user.points)).scalar()
     print (limit)
     
-    user1 = db.query(model.user).filter(model.user.points >= limit).all()
+    user1 = db.query(model.user).filter(model.user.points >= limit | model.user.points < 0).all()
     for user_info in user1:
-        user_info.money = user_info.points * add_value.value4m
+        user_info.money = user_info.money + (user_info.points * add_value.value4m)
+        user_info.points = 0
         db.commit()
         #should clear the points of those whos money is added
     return {"value": add_value.value4m}  

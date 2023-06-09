@@ -24,9 +24,9 @@ class UserInDB(User):
     password: str 
    
    
-class Points(BaseModel):
+class Money(BaseModel):
     uid: str
-    points: int
+    money: int
     
     
 class username(BaseModel):
