@@ -404,4 +404,16 @@ async def authenticate(user: schemas.User6):
         },
         headers={ "Private-Key": PRIVATE_KEY }
     )
-    return response.json()      
+    return response.json()   
+
+
+
+@app.get('/getplot', tags=["rem"]) 
+async def reminder( db : Session = Depends(get_db)):
+    
+    prod_all = db.query(model.Plots).all()
+    if not prod_all:
+        return {"No PLOT to dispose"}
+    
+    
+    return prod_all     
