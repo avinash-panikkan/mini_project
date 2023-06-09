@@ -298,43 +298,13 @@ async def redeem(request:schemas.Money, current_user: schemas.User= Depends(oaut
 
 #plots
  
-@app.post('/plots', tags=["plots"])
-async def addplot(name: str = Form(), points: int = Form(), file: UploadFile = File(),
-                  current_user: schemas.User= Depends(oaut2.adminlogin),db : Session = Depends(get_db)):
-    
-    # Generate a unique filename for the uploaded image
-    FILEPATH = "static/plots/"
-    filename = file.filename
-    extension = filename.split(".")[-1]
-    
-    if extension not in ["png","jpg","jpeg","webp","heif"]:
-        return {
-            "status": "error",
-            "detail": "File extension not allowed"
-        }
-    
-    token_name = secrets.token_hex(10) + "." + extension  
-    generated_name = FILEPATH + token_name
-    file_content = await file.read()
-
-    with open(generated_name, "wb") as file:
-        file.write(file_content)
-        
-    #PILLOW - reduce size
-    img = Image.open(generated_name)
-    img = img.resize(size= (200, 200))
-    img.save(generated_name)
-    
-    plot1 = model.Plots(name= name, points= points, path= generated_name)
+@app.post('/plot',tags=['plots'])
+async def plot(request:schemas.Plot,db : Session = Depends(get_db)):
+    plot1 = model.Plots(name = request.name,points= request.points,image =request.image)
     db.add(plot1)
     db.commit()
-    db.refresh(plot1)
-    
-    return { 
-        "name": name,
-        "points": points,
-        "file_path": generated_name
-    }  
+    db.refresh(plot1) 
+    return plot1
     
     
     
