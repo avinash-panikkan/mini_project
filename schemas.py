@@ -70,5 +70,12 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     name: Union[str, None] = None
 
+
+class Plot(BaseModel):
+    name: str
+    points: int
+    image: str
+    
+    
 class User6(BaseModel):
     username: str
