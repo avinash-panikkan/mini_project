@@ -360,7 +360,8 @@ async def reminder(current_user: schemas.User= Depends(oaut2.get_current_active_
     
     prod_all = db.query(model.Product).filter((model.Product.user_id == current_user.id) & (model.Product.disposed == False)).all()
     if not prod_all:
-        raise HTTPException(status_code=404, detail="No products to dispose")
+        return {"No products to dispose"}
+    
     
     return prod_all 
 
