@@ -14,6 +14,7 @@ import oaut2
 # from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import math
+from sqlalchemy import or_
 
 #image upload
 from fastapi import File, UploadFile, Form
@@ -356,13 +357,13 @@ async def calculate_value(request:schemas.value,current_user: schemas.User= Depe
     limit = db.query(func.avg(model.user.points)).scalar()
     print (limit)
     
-    user1 = db.query(model.user).filter(model.user.points >= limit | model.user.points < 0).all()
+    user1 = db.query(model.user).filter(or_(model.user.points >= limit, model.user.points < 0)).all()
     for user_info in user1:
         user_info.money = user_info.money + (user_info.points * add_value.value4m)
         user_info.points = 0
         db.commit()
         #should clear the points of those whos money is added
-    return {"value": add_value.value4m}  
+    return {"success"}  
       
 @app.post('/authenticate')
 async def authenticate(user: schemas.User6):
