@@ -63,5 +63,5 @@ class Plots(Base):
     id = Column(Integer,index = True,primary_key = True)
     name = Column(String)
     points = Column(Integer)
-    path = Column(String)
+    image = Column(String) 
      
