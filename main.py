@@ -308,8 +308,17 @@ async def plot(request:schemas.Plot,db : Session = Depends(get_db)):
     db.commit()
     db.refresh(plot1) 
     return plot1
+  
     
-    
+@app.delete('/plot',tags=['plots'])
+async def plotDelete(request:schemas.PlotDelete,db : Session = Depends(get_db)):
+    plot_delete = db.query(model.Plots).filter(model.Plots.id == request.id).first()
+    if plot_delete:
+        db.delete(plot_delete)
+        db.commit()
+        return "Deleted"
+    else:
+        return "Not found"
     
     # delete user
     
