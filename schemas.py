@@ -76,6 +76,9 @@ class Plot(BaseModel):
     points: int
     image: str
     
-    
+
+class PlotDelete(BaseModel):
+    id: int
+
 class User6(BaseModel):
     username: str
