@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\NITHIN\Desktop\finalapi"
+VIRTUAL_ENV="D:\RR\mini_project"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
@@ -55,9 +55,9 @@ fi
 
 if [ -z "${VIRTUAL_ENV_DISABLE_PROMPT:-}" ] ; then
     _OLD_VIRTUAL_PS1="${PS1:-}"
-    PS1="(finalapi) ${PS1:-}"
+    PS1="(mini_project) ${PS1:-}"
     export PS1
-    VIRTUAL_ENV_PROMPT="(finalapi) "
+    VIRTUAL_ENV_PROMPT="(mini_project) "
     export VIRTUAL_ENV_PROMPT
 fi
 

@@ -285,16 +285,18 @@ async def redeem(request:schemas.Money, current_user: schemas.User= Depends(oaut
     
     user_money = db.query(model.user).filter((model.user.uid == current_user.uid)).first()
     if user_money.money >= request.money:
-        user_money.money = user_money.money - request.money
     
-    store_money = db.query(model.user).filter(model.user.uid == request.uid).first()
-    if store_money is not None:
-        store_money.money = store_money.money + request.money
-        
-        db.commit() 
-        return "Success" 
+        store_money = db.query(model.user).filter(model.user.uid == request.uid).first()
+        if store_money is not None:
+            user_money.money = user_money.money - request.money
+            store_money.money = store_money.money + request.money
+            
+            db.commit() 
+            return "Success" 
+        else:
+            return "Store not found"
     else:
-        return "Store not found"
+        return "Insufficient balance"
 
 
 #plots
