@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column,Integer,String,ForeignKey,Boolean
+from sqlalchemy import Column,Integer,String,ForeignKey,Boolean,Date
 from sqlalchemy.orm import relationship
 
 
@@ -25,7 +25,9 @@ class Product(Base):
     pid = Column(String, nullable=True)
     purchased = Column(Boolean, default=False)
     disposed = Column(Boolean, default=False)
+    date = Column(String, default=False)
     user_id = Column(Integer, ForeignKey("users.id"))
+    
     
     owner = relationship("user", back_populates="product")
  

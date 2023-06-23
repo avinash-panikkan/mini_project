@@ -11,6 +11,7 @@ from tocken1 import create_access_token
 from sqlalchemy import desc, func
 import uuid 
 import oaut2
+from datetime import datetime
 # from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import math
@@ -195,7 +196,20 @@ async def add(request:schemas.prod,current_user: schemas.User= Depends(oaut2.sto
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     
     for prod in request.pid:
-        product1 = model.Product(pid = prod, purchased=True,user_id=user2.id)
+        
+       
+
+    # datetime object containing current date and time
+        now = datetime.now()
+        
+        print("now =", now)
+
+        # dd/mm/YY H:M:S
+        date_string = now.strftime("%d/%m/%Y %H:%M")
+        
+        
+        
+        product1 = model.Product(pid = prod, purchased=True,user_id=user2.id,date= date_string)
         
         db.add(product1)
         db.commit() 
