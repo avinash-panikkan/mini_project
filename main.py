@@ -55,7 +55,7 @@ def get_db():
     finally:
         db.close()
 
-PRIVATE_KEY = "9efc7501-bd41-438b-9fe4-53b12456da65"
+PRIVATE_KEY = "d99bb585-9b78-4bfb-8d31-cbec2d590502"
 
 
 @app.post('/user',tags=['user'])
